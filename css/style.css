@@ -17,12 +17,13 @@ body {
 /*--------CARTE GENERALE ETANGS--------*/
 
 #map-section {
-  height: calc(100vh - 60px); /* plein écran moins le header */
+  height: calc(90vh - 60px); /* plein écran moins le header */
 }
 
 #map {
-  width: 100%;
-  height: 100%;
+  width: 70%;
+  height: 80%;
+  margin-left: 5%;
 }
 
 /*--------MENU--------*/
@@ -32,7 +33,7 @@ body {
     height: 50px;
     min-height: 50px;
     border-radius: 0px 0 10px 10px;
-    background: #09332c;
+    background: #35b8a2;
     position: fixed;
     top: 0;
     display: flex;
@@ -146,95 +147,11 @@ body {
     }
 }
 
-/* PORTRAIT */
-
-.portrait-rond {
-    width: 17%; /*17% de la largeur de la section*/
-    padding-bottom: 17%; /*Permet d'avoir une image avec la même hauteur que largeur*/
-    height: 0; /*Padding-bottom contrôle la hauteur*/
-    border-radius: 50%;
-    position: absolute;
-    z-index: 1;
-    box-shadow: 0px 0px 25px #cbcbd3;
-    top: 25%;
-    overflow: hidden; /*Pour que l'image ne dépasse pas*/
-}
-
-.portrait-rond img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    object-fit: cover;
-}
-
-@media screen and (max-width: 768px) {
-    .portrait-rond {
-        width: 30%;
-        padding-bottom: 30%;
-        top: 15%;
-    }
-}
-
-/* DIAPORAMA */
-
-.container{
-    position: absolute;
-    transform: translate(-50%,-50%);
-    overflow: hidden;
-    top: 0;
-    left: 0;
-    box-shadow: 10px 25px 30px rgba(30,30,200,0.3);
-    transform: none;
-    z-index: 0;
-}
-
-.wrapper{
-    width: 100%;
-    display: flex;
-    animation: slide 24s infinite;
-}
-
-@keyframes slide{
-    0%{
-        transform: translateX(0);
-    }
-    25%{
-        transform: translateX(0);
-    }
-    30%{
-        transform: translateX(-100%);
-    }
-    50%{
-        transform: translateX(-100%);
-    }
-    55%{
-        transform: translateX(-200%);
-    }
-    75%{
-        transform: translateX(-200%);
-    }
-    80%{
-        transform: translateX(-300%);
-    }
-    100%{
-        transform: translateX(-300%);
-    }
-}
-
-img{
-    width: 100%;
-    height: auto;
-}
-
 /*--------ACCUEIL--------*/
 
 .accueil {
-    height: 100vh;
-    min-height: 90vh;
+    height: 50vh;
+    min-height: 20vh;
     width: 100%;
     position: relative;
     margin-left: auto;
@@ -259,38 +176,6 @@ h1 {
     position: absolute;
     top: 85vh;
     color: #f1f1f1;
-}
-
-.btn-accueil {
-    display: inline-flex;
-    width: 200px;
-    height: 50px;
-    z-index: 1;
-    position: absolute;
-    text-decoration: none;
-    background: #09332c;
-    justify-content: center;
-    align-items: center;
-    color: #f1f1f1;
-    margin: 10px 0 0 0;
-    border-radius: 2px;
-    font-size: 18px;
-    align-self: flex-start;
-}
-
-.btn-accueil1 {
-    margin: 100px 0 0 250px; /* décale de 100 px vers le bas et 250 px vers la droite = taille des marges au sein de la classe*/
-    z-index: 1;
-    position: absolute;
-} 
-
-.btn-accueil2 {
-    margin: 100px 0 0 60px;
-    background: transparent;
-    border: 2px solid #09332c;
-    color: #ffffff;
-    z-index: 1;
-    position: absolute;
 }
 
 /* Adaptation aux téléphones */
