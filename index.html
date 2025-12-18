@@ -13,8 +13,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Kameron&display=swap" rel="stylesheet">
     <!-- MapLibre CSS -->
     <link href="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.css" rel="stylesheet"/>
-    <!-- CSS du site -->
-    <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
@@ -22,17 +20,17 @@
 
     <nav class="barre-nav">
         <div class="bloc-menu">
-            <span class="nav-menu-item"><a href="#accueil">Overview</a></span>
-            <span class="nav-menu-item"><a href="#parc">Parcours</a></span>
-            <span class="nav-menu-item"><a href="#port">Portfolio</a></span>
-            <span class="nav-menu-item"><a href="#range">Compétences</a></span>
+            <span class="nav-menu-item"><a href="#accueil">Accueil</a></span>
+            <span class="nav-menu-item"><a href="#parc">Overview</a></span>
+            <span class="nav-menu-item"><a href="#port">Zoom</a></span>
+            <span class="nav-menu-item"><a href="#range">Partie 4</a></span>
         </div>
         <div class="cont-ligne">
             <div class="ligne-unique"></div>
         </div>
     </nav>
 
-        <!-- SECTION ACCUEIL -->
+    <!-- SECTION ACCUEIL -->
 
     <section class="accueil" id="accueil">
         <h1>Dynamique hydrique des étangs de la Brenne</h1>
@@ -41,24 +39,55 @@
     </section>
 
     <!-- SECTION CARTE -->
+
     <main>
         <section id="map-section">
         <div id="map"></div>
+
+          <!-- CONTROLES -->
+        <div id="controls">
+            <input
+            type="range"
+            id="timeSlider"
+            min="0"
+            max="0"
+            step="1"
+            value="0"
+            />
+            <div id="dateLabel"></div>
+        </div>
+        <div id="bivariate-legend">
+            <div class="legend-title">NDVI / MNDWI</div>
+            <div class="legend-grid"></div>
+            <div class="legend-axis legend-x">
+                <span>NDVI faible</span>
+                <span>NDVI moyen</span>
+                <span>NDVI fort</span>
+            </div>
+            <div class="legend-axis legend-y">
+                <span>MNDWI fort</span>
+                <span>MNDWI moyen</span>
+                <span>MNDWI faible</span>
+            </div>
+            </div>
+
         </section>
     </main>
 
     <!-- MapLibre JS -->
+
     <script src="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
 
     <!-- JS carte -->
-    <script src="js/map.js"></script>
+
+    <script type="module" src="js/map.js"></script>
 
     <!-- SECTION PRESENTATION -->
 
     <section class="presentation" id="pres">
-        <h2 class="titre-pres">Apprenez à me connaître !</h2>
+        <h2 class="titre-pres">Lorem ipsum</h2>
             <div class="pres-txt">
-                <h3>Bonjour, je m'appelle Nicolas Requin et je suis étudiant en géomatique.</h3>
+                <h3>Lorem ipsum</h3>
                 <hr>
                 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum, hic delectus consequatur minima maiores odit, adipisci nihil consequuntur sed quis asperiores ut ullam aliquid laboriosam recusandae temporibus cupiditate debitis et!</p>
                 <br>

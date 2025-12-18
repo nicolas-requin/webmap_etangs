@@ -19,16 +19,16 @@ from rasterio.mask import mask
 import geopandas as gpd
 
 # --- Fichiers sources ---
-path_shp = "../mini_etangs.shp"  # ton shapefile réduit
-path_ndvi = "../indices/NDVI_2023.tif"
-path_water = "../indices/MNDWI_2023.tif"
+path_shp = "layers/mini_etangs.shp"  # shapefile réduit
+path_ndvi = "layers/NDVI_2018.tif"
+path_water = "layers/MNDWI_2018.tif"
 
 # --- Charger le shapefile ---
 etangs = gpd.read_file(path_shp)
 
 # Si le CRS est manquant, on le définit manuellement
 if etangs.crs is None:
-    etangs.set_crs(epsg=2154, inplace=True)  # 🔹 adapte le code EPSG selon ton shapefile
+    etangs.set_crs(epsg=2154, inplace=True)
 
 # Puis on reprojette si nécessaire
 with rasterio.open(path_ndvi) as src_ref:
@@ -50,6 +50,7 @@ def crop_raster(input_path, output_path, geometries):
     with rasterio.open(input_path) as src:
         out_image, out_transform = mask(src, geometries, crop=True)
         out_meta = src.meta.copy()
+        out_meta.pop("descriptions", None)
         out_meta.update({
             "height": out_image.shape[1],
             "width": out_image.shape[2],
@@ -74,6 +75,6 @@ def crop_raster(input_path, output_path, geometries):
     print(f"Raster découpé : {output_path} (bandes = {len(band_descriptions)})")
 
 
-# --- Découpe NDVI et masque eau ---
-crop_raster(path_ndvi, "NDVI_2023_test.tif", geoms)
-crop_raster(path_water, "MNDWI_2023_test.tif", geoms)
+# --- Découpe NDVI et MNDWI ---
+crop_raster(path_ndvi, "layers/NDVI_2018_test.tif", geoms)
+crop_raster(path_water, "layers/MNDWI_2018_test.tif", geoms)
