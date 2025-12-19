@@ -9,7 +9,7 @@ from matplotlib.animation import FuncAnimation
 # --- Fichiers sources ---
 path_ndvi = "../NDVI_2018_test.tif"
 path_mndwi = "MNDWI_2018_test.tif"
-path_shp = "../mini_etangs.shp"
+path_shp = "layers/mini_etangs.shp"
 
 # --- Charger les étangs ---
 etangs = gpd.read_file(path_shp)

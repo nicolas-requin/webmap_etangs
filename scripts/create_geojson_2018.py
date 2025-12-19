@@ -4,8 +4,10 @@ export en GeoJSON temporel pour webmapping.
 """
 
 import rasterio
+import os
 import geopandas as gpd
 import numpy as np
+import tempfile
 from rasterstats import zonal_stats
 
 # --- Fichiers sources ---
@@ -14,20 +16,6 @@ path_water = "layers/MNDWI_2018_test.tif"
 path_ndvi = "layers/NDVI_2018_test.tif"
 
 id_field = "id"
-
-# Seuils
-ndvi_bins = [-0.1, 0.3, 0.6]       # faible / moyen / fort
-freq_bins = [0.2, 0.4, 0.6]       # faible / moyen / fort
-
-def classify_3(x, bins):
-    if x is None or np.isnan(x):
-        return None
-    if x < bins[1]:
-        return 0
-    elif x < bins[2]:
-        return 1
-    else:
-        return 2
 
 # --- Charger shapefile ---
 etangs = gpd.read_file(path_shp)
@@ -62,50 +50,64 @@ assert ndvi.shape == water.shape, "NDVI et eau doivent avoir les mêmes dimensio
 
 features = []
 
-# --- Boucle temporelle ---
-for i, date_str in enumerate(dates):
-    print(f"Traitement {date_str} ({i+1}/{n_dates})")
+with tempfile.TemporaryDirectory() as tmpdir:   #Rasters temporaires qui seront supprimés après
+    water_path = os.path.join(tmpdir, "water.tif")
+    ndvi_path = os.path.join(tmpdir, "ndvi.tif")
 
-    # Rasters temporaires
-    with rasterio.open("temp_water.tif", "w", **water_meta) as dst:
-        dst.write(water[i], 1)
-    with rasterio.open("temp_ndvi.tif", "w", **ndvi_meta) as dst:
-        dst.write(ndvi[i], 1)
+    # --- Boucle temporelle ---
+    for i, date_str in enumerate(dates):
+        print(f"Traitement {date_str} ({i+1}/{n_dates})")
 
-    # Stats zonales
-    zs_water = zonal_stats(
-        etangs, "temp_water.tif",
-        stats="mean", nodata=nodata_water, all_touched=True
-    )
-    zs_ndvi = zonal_stats(
-        etangs, "temp_ndvi.tif",
-        stats="mean", nodata=nodata_ndvi, all_touched=True
-    )
+        # Rasters temporaires
+        with rasterio.open(water_path, "w", **water_meta) as dst:
+            dst.write(water[i], 1)
+        with rasterio.open(ndvi_path, "w", **ndvi_meta) as dst:
+            dst.write(ndvi[i], 1)
 
-    # Stockage
-    for pond_id, zw, zn in zip(etangs.index, zs_water, zs_ndvi):
-        features.append({
-            "pond_id": pond_id,
-            "date": date_str,
-            "freq_eau": zw["mean"],
-            "ndvi": zn["mean"],
-            "geometry": etangs.loc[pond_id].geometry
-        })
+        # Stats zonales
+        zs_water = zonal_stats(
+            etangs, water_path,
+            stats="mean", nodata=nodata_water, all_touched=True
+        )
+        zs_ndvi = zonal_stats(
+            etangs, ndvi_path,
+            stats="mean", nodata=nodata_ndvi, all_touched=True
+        )
 
-# --- GeoDataFrame ---
-gdf = gpd.GeoDataFrame(features, crs=etangs.crs)
+        # Stockage
+        for pond_id, zw, zn in zip(etangs.index, zs_water, zs_ndvi):
+            features.append({
+                "pond_id": pond_id,
+                "date": date_str,
+                "freq_eau": zw["mean"],
+                "ndvi": zn["mean"],
+                "geometry": etangs.loc[pond_id].geometry
+            })
 
-# --- Reprojection web ---
-gdf = gdf.to_crs(epsg=4326)
+    # --- GeoDataFrame ---
+    gdf = gpd.GeoDataFrame(features, crs=etangs.crs)
 
-# --- Affectation de classes bivariées ---
-gdf["ndvi_class"] = gdf["ndvi"].apply(lambda x: classify_3(x, ndvi_bins))
-gdf["freq_class"] = gdf["freq_eau"].apply(lambda x: classify_3(x, freq_bins))
+    # --- Reprojection en 4326 pour le web ---
+    gdf = gdf.to_crs(epsg=4326)
 
-gdf["bivar_class"] = gdf["ndvi_class"] * 3 + gdf["freq_class"] + 1
+    # --- Affectation de classes bivariées ---
 
-# --- Export GeoJSON ---
-output = "data/etangs_temporal_2018.geojson"
-gdf.to_file(output, driver="GeoJSON")
+    ndvi_vals = gdf["ndvi"].dropna().values #sans les NA
+    freq_vals = gdf["freq_eau"].dropna().values
+
+    ndvi_bins = np.quantile(ndvi_vals, [0.33, 0.66]) #Division des valeurs en 3 quantiles égaux
+    freq_bins = np.quantile(freq_vals, [0.33, 0.66])
+
+    print("Seuils NDVI calculés à partir de l'ensemble des valeurs :", ndvi_bins)
+    print("Seuils MNDWI calculés à partir de l'ensemble des valeurs :", freq_bins)
+
+    gdf["ndvi_class"] = np.digitize(gdf["ndvi"], ndvi_bins)
+    gdf["freq_class"] = np.digitize(gdf["freq_eau"], freq_bins)
+
+    gdf["bivar_class"] = gdf["ndvi_class"] + 3 * gdf["freq_class"] + 1    #Pour que les classes soient 1-9
+
+    # --- Export GeoJSON ---
+    output = "data/etangs_temporal_2018.geojson"
+    gdf.to_file(output, driver="GeoJSON")
 
 print(f"GeoJSON temporel créé : {output}")
