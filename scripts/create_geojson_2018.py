@@ -5,6 +5,7 @@ export en GeoJSON temporel pour webmapping.
 
 import rasterio
 import os
+import pandas as pd
 import geopandas as gpd
 import numpy as np
 import tempfile
@@ -48,10 +49,11 @@ n_dates = len(dates)
 
 assert ndvi.shape == water.shape, "NDVI et eau doivent avoir les mêmes dimensions"
 
+# --- Extraction valeurs zonales hebdomadaires ---
 features = []
 
 with tempfile.TemporaryDirectory() as tmpdir:   #Rasters temporaires qui seront supprimés après
-    water_path = os.path.join(tmpdir, "water.tif")
+    water_path = os.path.join(tmpdir, "mndwi.tif")
     ndvi_path = os.path.join(tmpdir, "ndvi.tif")
 
     # --- Boucle temporelle ---
@@ -90,24 +92,47 @@ with tempfile.TemporaryDirectory() as tmpdir:   #Rasters temporaires qui seront 
     # --- Reprojection en 4326 pour le web ---
     gdf = gdf.to_crs(epsg=4326)
 
+
+    # --- Lissage des valeurs par mois ---
+    gdf["date"] = pd.to_datetime(gdf["date"])
+    gdf["month"] = gdf["date"].dt.to_period("M")
+
+    df_monthly = (
+        gdf
+        .groupby(["pond_id", "month"], as_index=False)
+        .agg({
+            "ndvi": "mean",
+            "freq_eau": "mean",
+            "geometry": "first"
+        })
+    )
+
+    gdf_monthly = gpd.GeoDataFrame(
+        df_monthly,
+        geometry="geometry",
+        crs=gdf.crs
+    )
+
+    gdf_monthly["date"] = gdf_monthly["month"].dt.to_timestamp() + pd.Timedelta(days=14)    #Milieu du mois comme date représentative
+    gdf_monthly = gdf_monthly.drop(columns="month")
+
+    gdf_monthly = gdf_monthly.to_crs(epsg=4326)
+
     # --- Affectation de classes bivariées ---
+    ndvi_vals = gdf_monthly["ndvi"].dropna().values
+    freq_vals = gdf_monthly["freq_eau"].dropna().values
 
-    ndvi_vals = gdf["ndvi"].dropna().values #sans les NA
-    freq_vals = gdf["freq_eau"].dropna().values
-
-    ndvi_bins = np.quantile(ndvi_vals, [0.33, 0.66]) #Division des valeurs en 3 quantiles égaux
+    ndvi_bins = np.quantile(ndvi_vals, [0.33, 0.66])    #Division des valeurs en 3 quantiles égaux
     freq_bins = np.quantile(freq_vals, [0.33, 0.66])
 
-    print("Seuils NDVI calculés à partir de l'ensemble des valeurs :", ndvi_bins)
-    print("Seuils MNDWI calculés à partir de l'ensemble des valeurs :", freq_bins)
+    gdf_monthly["ndvi_class"] = np.digitize(gdf_monthly["ndvi"], ndvi_bins)
+    gdf_monthly["freq_class"] = np.digitize(gdf_monthly["freq_eau"], freq_bins)
 
-    gdf["ndvi_class"] = np.digitize(gdf["ndvi"], ndvi_bins)
-    gdf["freq_class"] = np.digitize(gdf["freq_eau"], freq_bins)
-
-    gdf["bivar_class"] = gdf["ndvi_class"] + 3 * gdf["freq_class"] + 1    #Pour que les classes soient 1-9
+    gdf_monthly["bivar_class"] = gdf_monthly["ndvi_class"] + 3 * gdf_monthly["freq_class"] + 1  #Pour que les classes soient 1-9
 
     # --- Export GeoJSON ---
-    output = "data/etangs_temporal_2018.geojson"
-    gdf.to_file(output, driver="GeoJSON")
+    output = "data/etangs_mensuel_2018.geojson"
+    gdf_monthly.to_file(output, driver="GeoJSON")
+
 
 print(f"GeoJSON temporel créé : {output}")
