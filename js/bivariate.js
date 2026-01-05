@@ -34,7 +34,7 @@ export function createBivariateLegend() {
   // ordre visuel : ligne du haut = eau forte
   for (let y = 2; y >= 0; y--) {
     for (let x = 0; x < 3; x++) {
-      const cls = y * 3 + x + 1;
+      const cls = x * 3 + y + 1;
       const cell = document.createElement('div');
       cell.style.backgroundColor = bivariateColors[cls];
       grid.appendChild(cell);
