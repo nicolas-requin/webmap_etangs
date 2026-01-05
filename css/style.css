@@ -14,6 +14,66 @@ body {
     background: #f1f1f1;
 }
 
+
+/*--------ACCUEIL--------*/
+
+.accueil {
+    height: 70vh;
+    min-height: 50vh;
+    width: 100%;
+    position: relative;
+    margin-left: auto;
+    overflow: hidden;
+    display: flex; /* Pour centrer */
+    align-items: center; /* Verticalement centré */
+    flex-direction: column; /* Empile les éléments verticalement */
+}
+
+h1 {
+    font-size: 50px;
+    font-family: 'Roboto', arial;
+    z-index: 1;
+    position: absolute;
+    top: 15vh;
+    color: #000000;
+}
+
+.accueil-txt {
+    width: 60vw;
+    flex-shrink: 0;
+    margin-bottom: 20px;
+    padding-top: 25vh;
+    font-size: 20px;
+}
+
+/* Adaptation aux téléphones */
+
+@media screen and (max-width: 768px) {
+    .accueil {
+        width: 100%;
+        background-image: url('img/diapo_img1.jpg');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+    .btn-accueil {
+        display: none;
+    }
+    .btn-rond {
+        display: none;
+    }
+    .wrapper {
+        display: none;
+    }
+    h1 {
+        top: 30vh;
+    }
+    .txt-anim {
+        top: 60vh;
+    }
+}
+
+
 /*--------CARTE GENERALE ETANGS--------*/
 
 #map-section {
@@ -223,64 +283,6 @@ body {
     }
     .cont-ligne {
         display: block;
-    }
-}
-
-/*--------ACCUEIL--------*/
-
-.accueil {
-    height: 50vh;
-    min-height: 20vh;
-    width: 100%;
-    position: relative;
-    margin-left: auto;
-    overflow: hidden;
-    display: flex; /* Pour centrer */
-    align-items: center; /* Verticalement centré */
-    flex-direction: column; /* Empile les éléments verticalement */
-}
-
-h1 {
-    font-size: 90px;
-    font-family: 'Roboto', arial;
-    z-index: 1;
-    position: absolute;
-    top: 65vh;
-    color: #f1f1f1;
-}
-
-.txt-anim {
-    font-size: 40px;
-    z-index: 1;
-    position: absolute;
-    top: 85vh;
-    color: #f1f1f1;
-}
-
-/* Adaptation aux téléphones */
-
-@media screen and (max-width: 768px) {
-    .accueil {
-        width: 100%;
-        background-image: url('img/diapo_img1.jpg');
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
-    }
-    .btn-accueil {
-        display: none;
-    }
-    .btn-rond {
-        display: none;
-    }
-    .wrapper {
-        display: none;
-    }
-    h1 {
-        top: 30vh;
-    }
-    .txt-anim {
-        top: 60vh;
     }
 }
 
