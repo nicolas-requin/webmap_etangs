@@ -1,13 +1,13 @@
 export const bivariateColors = {
-  1: '#EDF8FB',
-  2: '#8FD18F',
-  3: '#1E8F4E',
-  4: '#C6C4E8',
-  5: '#7A7FD1',
-  6: '#5A5AA6',
-  7: '#2F6BFF',
-  8: '#4B5BC0',
-  9: '#2E2E7F'
+  1: '#e8e8e8',
+  2: '#b5c0da',
+  3: '#6c83b5',
+  4: '#b8d6be',
+  5: '#90b2b3',
+  6: '#567994',
+  7: '#73ae80',
+  8: '#5a9178',
+  9: '#2a5a5b'
 };
 
 export function bivariateFillExpression() {
