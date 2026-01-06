@@ -29,7 +29,7 @@ body {
     flex-direction: column; /* Empile les éléments verticalement */
 }
 
-h1 {
+.accueil h1 {
     font-size: 50px;
     font-family: 'Roboto', arial;
     z-index: 1;
