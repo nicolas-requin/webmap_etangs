@@ -47,38 +47,47 @@
 
     <section id="map-section">
         <h1>Carte des étangs</h1>
-        <div id="map"></div>
 
-        <!-- CONTROLES -->
-        <div id="controls">
-            <input
-            type="range"
-            id="timeSlider"
-            min="0"
-            max="0"
-            step="1"
-            value="0"
-            />
-            <div id="dateLabel"></div>
-        </div>
+        <div class="map-layout">
 
-        <!-- LEGENDE BIVARIEE -->
-        <div id="bivariate-legend">
-            <div class="legend-title">NDVI / MNDWI</div>
-            <div class="legend-grid"></div>
-            <div class="legend-axis legend-x">
-                <span>NDVI faible</span>
-                <span>NDVI moyen</span>
-                <span>NDVI fort</span>
+            <!-- COLONNE GAUCHE -->
+            <div class="map-left">
+                <div id="map"></div>
+
+                <div id="controls">
+                    <input
+                        type="range"
+                        id="timeSlider"
+                        min="0"
+                        max="0"
+                        step="1"
+                        value="0"
+                    />
+                    <div id="dateLabel"></div>
+                </div>
             </div>
-            <div class="legend-axis legend-y">
-                <span>MNDWI fort</span>
-                <span>MNDWI moyen</span>
-                <span>MNDWI faible</span>
-            </div>
-        </div>
 
+            <!-- COLONNE DROITE -->
+            <div class="map-right">
+                <div id="bivariate-legend">
+                    <div class="legend-title">NDVI / MNDWI</div>
+                    <div class="legend-grid"></div>
+                    <div class="legend-axis legend-x">
+                        <span>NDVI faible</span>
+                        <span>NDVI moyen</span>
+                        <span>NDVI fort</span>
+                    </div>
+                    <div class="legend-axis legend-y">
+                        <span>MNDWI fort</span>
+                        <span>MNDWI moyen</span>
+                        <span>MNDWI faible</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </section>
+
 
     <!-- MapLibre JS -->
 
