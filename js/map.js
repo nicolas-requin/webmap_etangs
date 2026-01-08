@@ -42,6 +42,21 @@ map.on('load', async () => {
     geojson.features.map(f => f.properties.date)
   )].sort();
 
+  // Compter les étangs par classe pour chaque date
+  const countsByDate = {};
+  dates.forEach(date => {
+    countsByDate[date] = {};
+    for (let cls = 1; cls <= 9; cls++) {
+      countsByDate[date][cls] = 0;
+    }
+    geojson.features
+      .filter(f => f.properties.date === date)
+      .forEach(f => {
+        const cls = f.properties.bivar_class;
+        countsByDate[date][cls]++;
+      });
+  });
+
   // Slider
   const slider = document.getElementById('timeSlider');
   const label = document.getElementById('dateLabel');
@@ -109,12 +124,14 @@ map.on('load', async () => {
       ]);
 
       label.textContent = date;
+
+      createBivariateLegend(countsByDate[date]);
     }
 
     slider.addEventListener('input', (e) => {
       updateMap(dates[e.target.value]);
     });
   
-  createBivariateLegend();
+  createBivariateLegend(countsByDate[dates[0]]);
 
 });

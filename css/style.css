@@ -168,17 +168,14 @@ body {
   grid-row: 2;
 
   display: grid;
-  grid-template-columns: repeat(3, var(--cell));
-  grid-template-rows: repeat(3, var(--cell));
+  grid-template-columns: repeat(3, auto);
+  grid-template-rows: repeat(3, auto);
   gap: var(--gap);
 
-  justify-self: center;
   margin: 0;
 }
 
 #bivariate-legend .legend-grid div{
-  width: var(--cell);
-  height: var(--cell);
   border-radius: 6px;
   border: 1px solid rgba(0,0,0,0.12);
 }
@@ -233,7 +230,7 @@ body {
   line-height: 1.1;
 
   transform-origin: 50% 0%;
-  transform: translate(-46px, 1px) rotate(-35deg);
+  transform: translate(-46px, 1px) rotate(-45deg);
 }
 
 
