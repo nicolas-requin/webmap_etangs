@@ -139,7 +139,7 @@ body {
   z-index: 2;
 
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: auto auto 25px;
   grid-template-rows: auto auto 92px; /* <-- réserve une vraie zone pour l’axe X */
   gap: 12px 14px;
   align-items: center;
@@ -150,10 +150,10 @@ body {
 /* ================= TITRE ================= */
 #bivariate-legend .legend-title{
   grid-column: 1 / -1;
-  margin: 0;
   text-align: center;
   font-weight: 700;
   font-size: 14px;
+  margin: 10px;
 }
 
 /* ================= VARIABLES ================= */
@@ -170,7 +170,7 @@ body {
   display: grid;
   grid-template-columns: repeat(3, auto);
   grid-template-rows: repeat(3, auto);
-  gap: var(--gap);
+  gap: 16px;
 
   margin: 0;
 }
