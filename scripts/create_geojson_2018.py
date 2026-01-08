@@ -130,6 +130,20 @@ with tempfile.TemporaryDirectory() as tmpdir:   #Rasters temporaires qui seront 
 
     gdf_monthly["bivar_class"] = gdf_monthly["ndvi_class"] + 3 * gdf_monthly["freq_class"] + 1  #Pour que les classes soient 1-9
 
+    gdf_monthly["month_num"] = gdf_monthly["date"].dt.month
+
+    gdf_season = gdf_monthly[
+        gdf_monthly["month_num"].between(3, 8)
+]
+    assec_status = (
+        gdf_season
+        .groupby("pond_id")["freq_class"]
+        .apply(lambda x: (x == 0).all())
+    )
+
+    gdf_monthly["assec"] = gdf_monthly["pond_id"].map(assec_status)
+    gdf_monthly["assec"] = gdf_monthly["assec"].fillna(False)
+
     # --- Export GeoJSON ---
     output = "data/etangs_mensuel_2018.geojson"
     gdf_monthly.to_file(output, driver="GeoJSON")

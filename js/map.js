@@ -68,15 +68,48 @@ map.on('load', async () => {
       filter: ['==', ['get', 'date'], dates[0]]
     });
 
+    map.addLayer({
+      id: 'etangs-outline',
+      type: 'line',
+      source: 'etangs',
+      paint: {
+        // jaune si assec, gris sinon
+        'line-color': [
+          'case',
+          ['==', ['get', 'assec'], true],
+          '#FFD700',   // jaune
+          '#444444'    // gris
+        ],
+
+        // contour plus épais pour les assecs
+        'line-width': [
+          'case',
+          ['==', ['get', 'assec'], true],
+          3,
+          1
+        ],
+
+        'line-opacity': 1
+      },
+      filter: ['==', ['get', 'date'], dates[0]]
+    });
+
 
     function updateMap(date) {
-    map.setFilter('etangs', [
-      '==',
-      ['get', 'date'],
-      date
-    ]);
-    label.textContent = date;
-  }
+      map.setFilter('etangs', [
+        '==',
+        ['get', 'date'],
+        date
+      ]);
+
+      map.setFilter('etangs-outline', [
+        '==',
+        ['get', 'date'],
+        date
+      ]);
+
+      label.textContent = date;
+    }
 
     slider.addEventListener('input', (e) => {
       updateMap(dates[e.target.value]);
