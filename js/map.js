@@ -6,7 +6,7 @@ const map = new maplibregl.Map({
   style: {
     version: 8,
     sources: {
-      osm: {
+      osm: {  //Définition de la source raster OSM Dark
         type: 'raster',
         tiles: [
           'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
@@ -17,7 +17,7 @@ const map = new maplibregl.Map({
         attribution: '© OpenStreetMap contributors'
       }
     },
-    layers: [
+    layers: [ //Fond de carte OSM Dark
       {
         id: 'osm',
         type: 'raster',
@@ -28,7 +28,7 @@ const map = new maplibregl.Map({
       }
     ]
   },
-  center: [1.2100, 46.7561],
+  center: [1.2100, 46.7561],  //Centrage sur les étangs de la Brenne
   zoom: 10
 });
 
@@ -57,7 +57,7 @@ map.on('load', async () => {
     data: geojson
   });
 
-    map.addLayer({
+    map.addLayer({  //Ajout couche des étangs
       id: 'etangs-fill',
       type: 'fill',
       source: 'etangs',
@@ -92,6 +92,16 @@ map.on('load', async () => {
         // mois <= octobre
         ['<=', ['to-number', ['slice', ['get', 'date'], 5, 7]], 10]
       ]
+    });
+
+    const toggleAssec = document.getElementById('toggleAssec');
+
+    toggleAssec.addEventListener('change', (e) => {
+      map.setLayoutProperty(
+        'etangs-assec-outline',
+        'visibility',
+        e.target.checked ? 'visible' : 'none'
+      );
     });
 
 
