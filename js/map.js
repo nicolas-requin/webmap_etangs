@@ -58,7 +58,7 @@ map.on('load', async () => {
   });
 
     map.addLayer({
-      id: 'etangs',
+      id: 'etangs-fill',
       type: 'fill',
       source: 'etangs',
       paint: {
@@ -69,43 +69,46 @@ map.on('load', async () => {
     });
 
     map.addLayer({
-      id: 'etangs-outline',
+      id: 'etangs-assec-outline',
       type: 'line',
       source: 'etangs',
       paint: {
-        // jaune si assec, gris sinon
-        'line-color': [
-          'case',
-          ['==', ['get', 'assec'], true],
-          '#FFD700',   // jaune
-          '#444444'    // gris
-        ],
-
-        // contour plus épais pour les assecs
-        'line-width': [
-          'case',
-          ['==', ['get', 'assec'], true],
-          3,
-          1
-        ],
-
+        'line-color': '#FFD700',
+        'line-width': 3,
         'line-opacity': 1
       },
-      filter: ['==', ['get', 'date'], dates[0]]
+      filter: [
+        'all',
+
+        // même date que le slider
+        ['==', ['get', 'date'], dates[0]],
+
+        // étang en assec
+        ['==', ['get', 'assec'], true],
+
+        // mois >= mars
+        ['>=', ['to-number', ['slice', ['get', 'date'], 5, 7]], 3],
+
+        // mois <= octobre
+        ['<=', ['to-number', ['slice', ['get', 'date'], 5, 7]], 10]
+      ]
     });
 
 
     function updateMap(date) {
-      map.setFilter('etangs', [
+
+      map.setFilter('etangs-fill', [
         '==',
         ['get', 'date'],
         date
       ]);
 
-      map.setFilter('etangs-outline', [
-        '==',
-        ['get', 'date'],
-        date
+      map.setFilter('etangs-assec-outline', [
+        'all',
+        ['==', ['get', 'date'], date],
+        ['==', ['get', 'assec'], true],
+        ['>=', ['to-number', ['slice', ['get', 'date'], 5, 7]], 3],
+        ['<=', ['to-number', ['slice', ['get', 'date'], 5, 7]], 10]
       ]);
 
       label.textContent = date;
