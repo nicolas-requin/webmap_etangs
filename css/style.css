@@ -263,6 +263,15 @@ body {
   max-width: 300px;
 }
 
+/*--------POPUP--------*/
+
+.maplibregl-popup-content {
+  width: 520px !important;
+  max-width: 520px !important;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
 /*--------MENU--------*/
 
 .barre-nav {
