@@ -78,7 +78,7 @@ body {
 
 #map {
     width: 100%;
-    height: 65vh;
+    height: 75vh;
     border-radius: 8px;
 }
 
@@ -387,55 +387,6 @@ body {
     }
 }
 
-/*--------PRESENTATION--------*/
-
-.presentation {
-    width: 100%;
-    position: relative;
-    overflow: hidden;
-    border-top: 1px dashed #333;
-    border-bottom: 1px dashed #333;
-    color: #e7e7e7;
-    background: #1b2e55;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-}
-
-.titre-pres {
-    font-size: 40px;
-    margin-bottom: 50px;
-}
-
-.pres-txt {
-    width: 40vw;
-    flex-shrink: 0;
-    margin-bottom: 20px;
-    padding-top: 20px;
-    font-size: 20px;
-}
-
-.pres-txt h3 {
-    font-size: 25px;
-}
-
-.pres-txt hr {      /*petite barre horizontale en-dessous du titre*/
-    width: 20%;
-    margin: 10px auto 20px auto;
-    color: #d6d6d6;
-}
-
-.pres-txt p {
-    text-align: justify;
-}
-
-@media screen and (max-width: 768px) {
-    .pres-txt {
-        width: 90vw;
-    }
-}
 
 /* FOOTER */
 
