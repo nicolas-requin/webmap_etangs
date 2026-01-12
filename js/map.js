@@ -180,15 +180,13 @@ map.on('load', async () => {
             data: data.map(d => d.ndvi),
             borderColor: 'green',
             backgroundColor: 'rgba(0, 128, 0, 0.1)',
-            fill: false,
-            yAxisID: 'y'
+            fill: false
           }, {
             label: 'MNDWI',
             data: data.map(d => d.freq_eau),
             borderColor: 'blue',
             backgroundColor: 'rgba(0, 0, 255, 0.1)',
-            fill: false,
-            yAxisID: 'y1'
+            fill: false
           }]
         },
         options: {
@@ -206,23 +204,10 @@ map.on('load', async () => {
               position: 'left',
               title: {
                 display: true,
-                text: 'NDVI'
-              },
-              min: 0,
-              max: 1
-            },
-            y1: {
-              type: 'linear',
-              position: 'right',
-              title: {
-                display: true,
-                text: 'MNDWI'
+                text: 'Valeur'
               },
               min: -1,
-              max: 1,
-              grid: {
-                drawOnChartArea: false
-              }
+              max: 1
             }
           },
           plugins: {
