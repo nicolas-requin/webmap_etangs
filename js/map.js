@@ -1,4 +1,4 @@
-import { bivariateFillExpression, createBivariateLegend } from './bivariate.js';
+import { bivariateFillExpression, createBivariateLegend, bivariateColors } from './bivariate.js';
 
 
 const map = new maplibregl.Map({
@@ -6,7 +6,7 @@ const map = new maplibregl.Map({
   style: {
     version: 8,
     sources: {
-      osm: {
+      osm: {  //Définition de la source raster OSM Dark
         type: 'raster',
         tiles: [
           'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
@@ -17,7 +17,7 @@ const map = new maplibregl.Map({
         attribution: '© OpenStreetMap contributors'
       }
     },
-    layers: [
+    layers: [ //Fond de carte OSM Dark
       {
         id: 'osm',
         type: 'raster',
@@ -28,7 +28,7 @@ const map = new maplibregl.Map({
       }
     ]
   },
-  center: [1.2100, 46.7561],
+  center: [1.2100, 46.7561],  //Centrage sur les étangs de la Brenne
   zoom: 10
 });
 
@@ -42,19 +42,21 @@ map.on('load', async () => {
     geojson.features.map(f => f.properties.date)
   )].sort();
 
-  // Compter les étangs par classe pour chaque date
+  // Pré-calculer les counts par date et classe
   const countsByDate = {};
   dates.forEach(date => {
-    countsByDate[date] = {};
-    for (let cls = 1; cls <= 9; cls++) {
-      countsByDate[date][cls] = 0;
+    const featuresForDate = geojson.features.filter(f => f.properties.date === date);
+    const counts = {};
+    for (let i = 1; i <= 9; i++) {
+      counts[i] = 0;
     }
-    geojson.features
-      .filter(f => f.properties.date === date)
-      .forEach(f => {
-        const cls = f.properties.bivar_class;
-        countsByDate[date][cls]++;
-      });
+    featuresForDate.forEach(f => {
+      const cls = f.properties.bivar_class;
+      if (cls >= 1 && cls <= 9) {
+        counts[cls]++;
+      }
+    });
+    countsByDate[date] = counts;
   });
 
   // Slider
@@ -72,8 +74,8 @@ map.on('load', async () => {
     data: geojson
   });
 
-    map.addLayer({
-      id: 'etangs',
+    map.addLayer({  //Ajout couche des étangs
+      id: 'etangs-fill',
       type: 'fill',
       source: 'etangs',
       paint: {
@@ -84,54 +86,118 @@ map.on('load', async () => {
     });
 
     map.addLayer({
-      id: 'etangs-outline',
+      id: 'etangs-assec-outline',
       type: 'line',
       source: 'etangs',
       paint: {
-        // jaune si assec, gris sinon
-        'line-color': [
-          'case',
-          ['==', ['get', 'assec'], true],
-          '#FFD700',   // jaune
-          '#444444'    // gris
-        ],
-
-        // contour plus épais pour les assecs
-        'line-width': [
-          'case',
-          ['==', ['get', 'assec'], true],
-          3,
-          1
-        ],
-
+        'line-color': '#FFD700',
+        'line-width': 3,
         'line-opacity': 1
       },
-      filter: ['==', ['get', 'date'], dates[0]]
+      filter: [
+        'all',
+
+        // même date que le slider
+        ['==', ['get', 'date'], dates[0]],
+
+        // étang en assec
+        ['==', ['get', 'assec'], true],
+
+        // mois >= mars
+        ['>=', ['to-number', ['slice', ['get', 'date'], 5, 7]], 3],
+
+        // mois <= octobre
+        ['<=', ['to-number', ['slice', ['get', 'date'], 5, 7]], 10]
+      ]
+    });
+
+    const toggleAssec = document.getElementById('toggleAssec');
+
+    toggleAssec.addEventListener('change', (e) => {
+      map.setLayoutProperty(
+        'etangs-assec-outline',
+        'visibility',
+        e.target.checked ? 'visible' : 'none'
+      );
     });
 
 
     function updateMap(date) {
-      map.setFilter('etangs', [
+
+      map.setFilter('etangs-fill', [
         '==',
         ['get', 'date'],
         date
       ]);
 
-      map.setFilter('etangs-outline', [
-        '==',
-        ['get', 'date'],
-        date
+      map.setFilter('etangs-assec-outline', [
+        'all',
+        ['==', ['get', 'date'], date],
+        ['==', ['get', 'assec'], true],
+        ['>=', ['to-number', ['slice', ['get', 'date'], 5, 7]], 3],
+        ['<=', ['to-number', ['slice', ['get', 'date'], 5, 7]], 10]
       ]);
 
       label.textContent = date;
 
-      createBivariateLegend(countsByDate[date]);
+      createBivariateChart(date);
     }
 
     slider.addEventListener('input', (e) => {
       updateMap(dates[e.target.value]);
     });
   
-  createBivariateLegend(countsByDate[dates[0]]);
+  createBivariateLegend();
+
+  // Créer le chart
+  let bivariateChart;
+  function createBivariateChart(date) {
+    const counts = countsByDate[date];
+    const labels = Object.keys(counts).map(cls => `Classe ${cls}`);
+    const data = Object.values(counts);
+    const backgroundColors = Object.keys(counts).map(cls => bivariateColors[parseInt(cls)]);
+
+    const ctx = document.getElementById('bivariateChart').getContext('2d');
+    if (bivariateChart) {
+      bivariateChart.destroy();
+    }
+    bivariateChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Nombre d\'étangs',
+          data: data,
+          backgroundColor: backgroundColors,
+          borderColor: backgroundColors.map(color => color),
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
+          },
+          x: {
+            ticks: {
+              autoSkip: false
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    });
+  }
+
+  createBivariateChart(dates[0]);
 
 });
