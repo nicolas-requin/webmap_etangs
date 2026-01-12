@@ -1,4 +1,4 @@
-import { bivariateFillExpression, createBivariateLegend } from './bivariate.js';
+import { bivariateFillExpression, createBivariateLegend, bivariateColors } from './bivariate.js';
 
 
 const map = new maplibregl.Map({
@@ -41,6 +41,23 @@ map.on('load', async () => {
   const dates = [...new Set(
     geojson.features.map(f => f.properties.date)
   )].sort();
+
+  // Pré-calculer les counts par date et classe
+  const countsByDate = {};
+  dates.forEach(date => {
+    const featuresForDate = geojson.features.filter(f => f.properties.date === date);
+    const counts = {};
+    for (let i = 1; i <= 9; i++) {
+      counts[i] = 0;
+    }
+    featuresForDate.forEach(f => {
+      const cls = f.properties.bivar_class;
+      if (cls >= 1 && cls <= 9) {
+        counts[cls]++;
+      }
+    });
+    countsByDate[date] = counts;
+  });
 
   // Slider
   const slider = document.getElementById('timeSlider');
@@ -122,6 +139,8 @@ map.on('load', async () => {
       ]);
 
       label.textContent = date;
+
+      createBivariateChart(date);
     }
 
     slider.addEventListener('input', (e) => {
@@ -129,5 +148,56 @@ map.on('load', async () => {
     });
   
   createBivariateLegend();
+
+  // Créer le chart
+  let bivariateChart;
+  function createBivariateChart(date) {
+    const counts = countsByDate[date];
+    const labels = Object.keys(counts).map(cls => `Classe ${cls}`);
+    const data = Object.values(counts);
+    const backgroundColors = Object.keys(counts).map(cls => bivariateColors[parseInt(cls)]);
+
+    const ctx = document.getElementById('bivariateChart').getContext('2d');
+    if (bivariateChart) {
+      bivariateChart.destroy();
+    }
+    bivariateChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Nombre d\'étangs',
+          data: data,
+          backgroundColor: backgroundColors,
+          borderColor: backgroundColors.map(color => color),
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
+          },
+          x: {
+            ticks: {
+              autoSkip: false
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    });
+  }
+
+  createBivariateChart(dates[0]);
 
 });

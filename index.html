@@ -83,10 +83,13 @@
                         <span>NDVI faible</span>
                     </div>
                 </div>
+                <div id="bivariate-chart-container">
+                    <canvas id="bivariateChart" width="300" height="200"></canvas>
+                </div>
                 <div id="assec-toggle">
                     <label>
                         <input type="checkbox" id="toggleAssec" checked>
-                        Étangs en assec
+                        Étangs en assec (visibles seulement de mars à octobre)
                     </label>
                 </div>
             </div>
@@ -98,6 +101,7 @@
     <!-- MapLibre JS -->
 
     <script src="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- JS carte -->
 
