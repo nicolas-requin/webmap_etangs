@@ -157,14 +157,9 @@ map.on('load', async () => {
 
       const uniqueId = `pond-${pond_id}-${Date.now()}`;
       const popupContent = `
-        <div style="width: 400px; font-family: Roboto, sans-serif;">
+        <div style="width: 500px; font-family: Roboto, sans-serif;">
           <h3>Étang ${pond_id}</h3>
-          <div style="margin-bottom: 10px;">
-            <canvas id="ndviChart-${uniqueId}" width="350" height="200"></canvas>
-          </div>
-          <div>
-            <canvas id="mndwiChart-${uniqueId}" width="350" height="200"></canvas>
-          </div>
+          <canvas id="combinedChart-${uniqueId}" width="450" height="250"></canvas>
         </div>
       `;
 
@@ -173,10 +168,10 @@ map.on('load', async () => {
         .setHTML(popupContent)
         .addTo(map);
 
-      // Créer les graphiques
-      const ndviCanvas = document.getElementById(`ndviChart-${uniqueId}`);
-      const ndviCtx = ndviCanvas.getContext('2d');
-      new Chart(ndviCtx, {
+      // Créer le graphique combiné
+      const combinedCanvas = document.getElementById(`combinedChart-${uniqueId}`);
+      const combinedCtx = combinedCanvas.getContext('2d');
+      new Chart(combinedCtx, {
         type: 'line',
         data: {
           labels: data.map(d => d.date),
@@ -185,52 +180,19 @@ map.on('load', async () => {
             data: data.map(d => d.ndvi),
             borderColor: 'green',
             backgroundColor: 'rgba(0, 128, 0, 0.1)',
-            fill: false
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: {
-              type: 'category',
-              title: {
-                display: true,
-                text: 'Date'
-              }
-            },
-            y: {
-              title: {
-                display: true,
-                text: 'NDVI'
-              }
-            }
-          },
-          plugins: {
-            legend: {
-              display: false
-            }
-          }
-        }
-      });
-
-      const mndwiCanvas = document.getElementById(`mndwiChart-${uniqueId}`);
-      const mndwiCtx = mndwiCanvas.getContext('2d');
-      new Chart(mndwiCtx, {
-        type: 'line',
-        data: {
-          labels: data.map(d => d.date),
-          datasets: [{
+            fill: false,
+            yAxisID: 'y'
+          }, {
             label: 'MNDWI',
             data: data.map(d => d.freq_eau),
             borderColor: 'blue',
             backgroundColor: 'rgba(0, 0, 255, 0.1)',
-            fill: false
+            fill: false,
+            yAxisID: 'y1'
           }]
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
+          responsive: false,
           scales: {
             x: {
               type: 'category',
@@ -240,15 +202,32 @@ map.on('load', async () => {
               }
             },
             y: {
+              type: 'linear',
+              position: 'left',
+              title: {
+                display: true,
+                text: 'NDVI'
+              },
+              min: 0,
+              max: 1
+            },
+            y1: {
+              type: 'linear',
+              position: 'right',
               title: {
                 display: true,
                 text: 'MNDWI'
+              },
+              min: -1,
+              max: 1,
+              grid: {
+                drawOnChartArea: false
               }
             }
           },
           plugins: {
             legend: {
-              display: false
+              display: true
             }
           }
         }
