@@ -37,6 +37,20 @@ map.on('load', async () => {
   const response = await fetch('data/etangs_mensuel_2018.geojson');
   const geojson = await response.json();
 
+  // Organiser les données par étang
+  const pondData = {};
+  geojson.features.forEach(feature => {
+    const pond_id = feature.properties.pond_id;
+    if (!pondData[pond_id]) pondData[pond_id] = [];
+    pondData[pond_id].push({
+      date: feature.properties.date,
+      ndvi: feature.properties.ndvi,
+      freq_eau: feature.properties.freq_eau
+    });
+  });
+  // Trier les données par date pour chaque étang
+  Object.values(pondData).forEach(data => data.sort((a, b) => new Date(a.date) - new Date(b.date)));
+
   // Dates uniques triées
   const dates = [...new Set(
     geojson.features.map(f => f.properties.date)
@@ -59,15 +73,20 @@ map.on('load', async () => {
     countsByDate[date] = counts;
   });
 
+  function formatYearMonth(dateString) {
+    return new Date(dateString).toISOString().slice(0, 7);
+  }
+  
   // Slider
   const slider = document.getElementById('timeSlider');
   const label = document.getElementById('dateLabel');
+
 
   slider.min = 0;
   slider.max = dates.length - 1;
   slider.value = 0;
 
-  label.textContent = dates[0];
+  label.textContent = formatYearMonth(dates[0]);
 
   map.addSource('etangs', {
     type: 'geojson',
@@ -119,6 +138,121 @@ map.on('load', async () => {
         'visibility',
         e.target.checked ? 'visible' : 'none'
       );
+    });
+
+    // Ajouter le curseur pointer sur les étangs
+    map.on('mouseenter', 'etangs-fill', () => {
+      map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'etangs-fill', () => {
+      map.getCanvas().style.cursor = '';
+    });
+
+    // Événement de clic sur les étangs
+    map.on('click', 'etangs-fill', (e) => {
+      const feature = e.features[0];
+      const pond_id = feature.properties.pond_id;
+      const data = pondData[pond_id];
+      if (!data) return;
+
+      const uniqueId = `pond-${pond_id}-${Date.now()}`;
+      const popupContent = `
+        <div style="width: 400px; font-family: Roboto, sans-serif;">
+          <h3>Étang ${pond_id}</h3>
+          <div style="margin-bottom: 10px;">
+            <canvas id="ndviChart-${uniqueId}" width="350" height="200"></canvas>
+          </div>
+          <div>
+            <canvas id="mndwiChart-${uniqueId}" width="350" height="200"></canvas>
+          </div>
+        </div>
+      `;
+
+      new maplibregl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML(popupContent)
+        .addTo(map);
+
+      // Créer les graphiques
+      const ndviCanvas = document.getElementById(`ndviChart-${uniqueId}`);
+      const ndviCtx = ndviCanvas.getContext('2d');
+      new Chart(ndviCtx, {
+        type: 'line',
+        data: {
+          labels: data.map(d => d.date),
+          datasets: [{
+            label: 'NDVI',
+            data: data.map(d => d.ndvi),
+            borderColor: 'green',
+            backgroundColor: 'rgba(0, 128, 0, 0.1)',
+            fill: false
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              type: 'category',
+              title: {
+                display: true,
+                text: 'Date'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'NDVI'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
+
+      const mndwiCanvas = document.getElementById(`mndwiChart-${uniqueId}`);
+      const mndwiCtx = mndwiCanvas.getContext('2d');
+      new Chart(mndwiCtx, {
+        type: 'line',
+        data: {
+          labels: data.map(d => d.date),
+          datasets: [{
+            label: 'MNDWI',
+            data: data.map(d => d.freq_eau),
+            borderColor: 'blue',
+            backgroundColor: 'rgba(0, 0, 255, 0.1)',
+            fill: false
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              type: 'category',
+              title: {
+                display: true,
+                text: 'Date'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'MNDWI'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
     });
 
 
