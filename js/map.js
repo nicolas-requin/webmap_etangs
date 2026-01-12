@@ -174,7 +174,7 @@ map.on('load', async () => {
       new Chart(combinedCtx, {
         type: 'line',
         data: {
-          labels: data.map(d => d.date),
+          labels: data.map(d => formatYearMonth(d.date)),
           datasets: [{
             label: 'NDVI',
             data: data.map(d => d.ndvi),
@@ -236,7 +236,7 @@ map.on('load', async () => {
         ['<=', ['to-number', ['slice', ['get', 'date'], 5, 7]], 10]
       ]);
 
-      label.textContent = date;
+      label.textContent = formatYearMonth(date);
 
       createBivariateChart(date);
     }
@@ -247,7 +247,7 @@ map.on('load', async () => {
   
   createBivariateLegend();
 
-  // Créer le chart
+  // Créer le diagramme en bâtons
   let bivariateChart;
   function createBivariateChart(date) {
     const counts = countsByDate[date];
