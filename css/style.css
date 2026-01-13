@@ -122,6 +122,12 @@ body {
     align-items: center;
 }
 
+.maplibregl-popup-content {
+  width: 520px !important;
+  max-width: 520px !important;
+  padding: 12px;
+  box-sizing: border-box;
+}
 
 /*--------LEGENDE BIVARIEE--------*/
 
