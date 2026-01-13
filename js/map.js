@@ -34,7 +34,7 @@ const map = new maplibregl.Map({
 
 map.on('load', async () => {
 
-  const years = ['2018', '2019'];
+  const years = ['2018', '2019', '2020', '2023'];
   const yearData = {};
 
   // Charger les données pour chaque année
