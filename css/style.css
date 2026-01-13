@@ -263,13 +263,38 @@ body {
   max-width: 300px;
 }
 
-/*--------POPUP--------*/
+/*--------ONGLETS ANNÉES--------*/
 
-.maplibregl-popup-content {
-  width: 520px !important;
-  max-width: 520px !important;
-  padding: 12px;
-  box-sizing: border-box;
+#year-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.year-tab {
+    background: #f1f1f1;
+    border: 1px solid #ddd;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-family: Roboto, sans-serif;
+    font-size: 16px;
+    border-radius: 5px 5px 0 0;
+    margin: 0 5px;
+    transition: background 0.3s;
+}
+
+.year-tab.active {
+    background: #1b2e55;
+    color: white;
+    border-bottom: 1px solid #1b2e55;
+}
+
+.year-tab:hover {
+    background: #ddd;
+}
+
+.year-tab.active:hover {
+    background: #1b2e55;
 }
 
 /*--------MENU--------*/
