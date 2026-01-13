@@ -34,7 +34,7 @@ const map = new maplibregl.Map({
 
 map.on('load', async () => {
 
-  const response = await fetch('data/etangs_mensuel_2018.geojson');
+  const response = await fetch('data/etangs_2018.geojson');
   const geojson = await response.json();
 
   // Organiser les données par étang
