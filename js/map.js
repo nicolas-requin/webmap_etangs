@@ -34,10 +34,10 @@ const map = new maplibregl.Map({
 
 map.on('load', async () => {
 
+  // Charger les données pour chaque année
   const years = ['2018', '2019', '2020', '2021', '2022', '2023'];
   const yearData = {};
 
-  // Charger les données pour chaque année
   for (const year of years) {
     const response = await fetch(`data/etangs_${year}.geojson`);
     const geojson = await response.json();
@@ -78,7 +78,7 @@ map.on('load', async () => {
       countsByDate[date] = counts;
     });
 
-    yearData[year] = {
+    yearData[year] = {  //stocker les données annuelles
       geojson,
       pondData,
       dates,
@@ -86,7 +86,7 @@ map.on('load', async () => {
     };
   }
 
-  let currentYear = '2018';
+  let currentYear = '2018'; // Année par défaut
 
   function formatYearMonth(dateString) {
     return new Date(dateString).toISOString().slice(0, 7);
@@ -105,7 +105,7 @@ map.on('load', async () => {
     });
   });
 
-  function setCurrentYear(year) {
+  function setCurrentYear(year) { // Mettre à jour l'année courante
     currentYear = year;
     yearTabs.forEach(tab => {
       tab.classList.toggle('active', tab.dataset.year === year);
@@ -113,15 +113,15 @@ map.on('load', async () => {
     updateMapForYear();
   }
 
-  function updateMapForYear() {
+  function updateMapForYear() { // Mettre à jour la carte pour l'année courante
     const data = yearData[currentYear];
     const dates = data.dates;
 
-    slider.min = 0;
+    slider.min = 0; // Remet le slider au début
     slider.max = dates.length - 1;
     slider.value = 0;
 
-    label.textContent = formatYearMonth(dates[0]);
+    label.textContent = formatYearMonth(dates[0]);  // Afficher la date initiale
 
     // Mettre à jour la source de la carte
     map.getSource('etangs').setData(data.geojson);
@@ -132,11 +132,11 @@ map.on('load', async () => {
       dates[0]
     ]);
 
-    map.setFilter('etangs-assec-outline', [
+    map.setFilter('etangs-assec-outline', [ // Filtrer les étangs en assec
       'all',
       ['==', ['get', 'date'], dates[0]],
       ['==', ['get', 'assec'], true],
-      ['>=', ['to-number', ['slice', ['get', 'date'], 5, 7]], 3],
+      ['>=', ['to-number', ['slice', ['get', 'date'], 5, 7]], 3], // Seulement de mars à octobre
       ['<=', ['to-number', ['slice', ['get', 'date'], 5, 7]], 10]
     ]);
 
@@ -160,7 +160,7 @@ map.on('load', async () => {
     filter: ['==', ['get', 'date'], yearData['2018'].dates[0]]
   });
 
-  map.addLayer({
+  map.addLayer({  //Ajout couche des contours des étangs en assec
     id: 'etangs-assec-outline',
     type: 'line',
     source: 'etangs',
@@ -180,7 +180,7 @@ map.on('load', async () => {
 
   const toggleAssec = document.getElementById('toggleAssec');
 
-  toggleAssec.addEventListener('change', (e) => {
+  toggleAssec.addEventListener('change', (e) => { // Afficher/masquer les contours des étangs en assec
     map.setLayoutProperty(
       'etangs-assec-outline',
       'visibility',
@@ -237,7 +237,7 @@ map.on('load', async () => {
           fill: false
         }]
       },
-      options: {
+      options: { 
         responsive: false,
         scales: {
           x: {
